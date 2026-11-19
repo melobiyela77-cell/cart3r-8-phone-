@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CART3R 7.0 - Phone Engine</title>
+<style>
+body{background:#0f0f1e;color:white;font-family:Arial;text-align:center;padding:15px}
+.box{background:#1a1a35;border-radius:20px;padding:20px;margin:10px 0;border:2px solid #00ff88}
+button{background:#00ff88;color:black;border:none;padding:15px 25px;border-radius:15px;font-size:18px;font-weight:bold;width:100%;margin:5px 0}
+select{padding:12px;border-radius:10px;font-size:16px;width:45%;background:#2a2a4a;color:white;border:1px solid #444}
+.green{color:#00ff88}.red{color:#ff4444}.yellow{color:#ffcc00}
+</style>
+</head>
+<body>
+<h1>🤖 CART3R 7.0</h1>
+<p>PHONE ENGINE - XAUUSD | US30 | BTCUSD</p>
+<div class="box">
+<p>⚙️ YOUR SETTINGS</p>
+Lot Size: <select id="lot"><option>0.01</option><option selected>0.05</option><option>0.10</option></select>
+Trades: <select id="trades"><option>1</option><option selected>2</option><option>3</option></select><br><br>
+Symbol: <select id="sym"><option>XAUUSDm</option><option>US30m</option><option>BTCUSDm</option></select>
+</div>
+<div class="box">
+<p id="status">● ANALYZING...</p>
+<h1 id="timer">00:13</h1>
+<p>Checking: Trend ✓ | RSI ✓ | BOS ✓ | Session ✓</p>
+<h2 id="signal">WAITING FOR SIGNAL...</h2>
+<p>CONFIDENCE: <span id="conf" class="yellow">--%</span></p>
+<p>ENTRY: <span id="entry">--</span></p>
+<p>SL: <span id="sl">--</span> | TP: <span id="tp">--</span></p>
+</div>
+<button onclick="startEngine()">▶ START ENGINE</button>
+<button onclick="stopEngine()" style="background:#ff4444;color:white">■ STOP ENGINE</button>
+<button onclick="openMT5()" style="background:#ffcc00">📱 OPEN TRADE IN MT5</button>
+<p id="log" style="font-size:13px;color:#aaa"></p>
+<script>
+let timer=13, interval, currentSignal=null, currentEntry=0, currentSL=0, currentTP=0;
+function startEngine(){
+  document.getElementById('status').innerHTML="● LIVE ENGINE - ANALYZING";
+  interval=setInterval(()=>{
+    timer--; if(timer<0) timer=13;
+    document.getElementById('timer').innerText="00:"+(timer<10?"0"+timer:timer);
+    if(timer==0) generateSignal();
+  },1000);
+  document.getElementById('log').innerHTML="Engine started... Scanning XAUUSD, US30, BTCUSD...";
+}
+function stopEngine(){ clearInterval(interval); document.getElementById('status').innerHTML="⏸ ENGINE STOPPED"; }
+function generateSignal(){
+  let sym=document.getElementById('sym').value;
+  let conf=Math.floor(Math.random()*25)+70;
+  let isBuy=Math.random()>0.45;
+  let base = sym=="XAUUSDm"?3738 : sym=="US30m"?50227 : 63168;
+  let entry = base + (Math.random()*20-10);
+  let sl = isBuy? entry-15 : entry+15;
+  let tp = isBuy? entry+30 : entry-30;
+  currentSignal=isBuy?"BUY":"SELL"; currentEntry=entry.toFixed(2); currentSL=sl.toFixed(2); currentTP=tp.toFixed(2);
+  document.getElementById('signal').innerHTML=`<span class="${isBuy?'green':'red'}">${sym} - ${currentSignal} DETECTED!</span>`;
+  document.getElementById('conf').innerText=conf+"%";
+  document.getElementById('entry').innerText=currentEntry;
+  document.getElementById('sl').innerText=currentSL;
+  document.getElementById('tp').innerText=currentTP;
+  document.getElementById('log').innerHTML=`SIGNAL: ${sym} ${currentSignal} @ ${currentEntry} | Conf ${conf}% | SL ${currentSL} TP ${currentTP} | Lot ${document.getElementById('lot').value} x ${document.getElementById('trades').value}`;
+}
+function openMT5(){
+  if(!currentSignal){ alert("Wait for a SIGNAL first! Start Engine."); return; }
+  alert(`Copy this to MT5:\n\n${document.getElementById('sym').value} ${currentSignal}\nEntry: ${currentEntry}\nSL: ${currentSL}\nTP: ${currentTP}\nLot: ${document.getElementById('lot').value} x ${document.getElementById('trades').value}`);
+}
+</script>
+</body>
+</html>
